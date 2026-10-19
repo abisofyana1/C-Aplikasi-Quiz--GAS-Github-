@@ -177,7 +177,11 @@
       color: #ffffff;
       padding: 8px 16px;
       font-size: 13px;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
       position: sticky;
       top: 0;
       z-index: 99999;
@@ -185,9 +189,17 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     `;
     demoBanner.innerHTML = `
-      <strong>Live Demo Mode:</strong> Data simulasi kuis offline (Password Dashboard: <code style="background:rgba(255,255,255,0.25);padding:2px 6px;border-radius:4px;font-weight:bold;">demo</code>).
+      <span><strong>Live Demo Mode:</strong> Data simulasi kuis offline (Password Dashboard: <code style="background:rgba(255,255,255,0.25);padding:2px 6px;border-radius:4px;font-weight:bold;">demo</code>).</span>
+      <button id="demo-reset-session-btn" style="background:#ef4444;color:#fff;border:none;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Kembali ke Halaman Awal / Reset</button>
     `;
     document.body.insertBefore(demoBanner, document.body.firstChild);
+
+    document.getElementById("demo-reset-session-btn")?.addEventListener("click", () => {
+      localStorage.removeItem("studentInfo");
+      localStorage.removeItem("quizProgress");
+      localStorage.removeItem("retakeRequestSent");
+      window.location.href = "index.html";
+    });
   });
 
   // Handler Factory untuk google.script.run

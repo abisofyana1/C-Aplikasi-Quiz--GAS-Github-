@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <script src="mock-gas.js"></script>
+  <style>
+    /* General Styling */
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #64748b;
+      --background-color: #f4f7f9;
+      --card-background: rgba(255, 255, 255, 0.96);
+      --card-border: rgba(15, 23, 42, 0.12);
+      --text-color: #1e293b;
+      --border-radius: 16px;
+      --box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      --gradient-start: #4facfe;
+      --gradient-end: #00f2fe;
+      --error-color: #dc3545;
+      --disabled-color: #e9ecef;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --option-hover: #f1f5f9;
+    }
+
+    [data-theme="dark"] {
+      --primary-color: #60a5fa;
+      --secondary-color: #cbd5e1;
+      --background-color: #0b1120;
+      --card-background: rgba(30, 41, 59, 0.94);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-color: #f8fafc;
+      --box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.6);
+      --disabled-color: #334155;
+      --input-bg: #0f172a;
+      --input-border: #475569;
+      --option-hover: #334155;
+    }
+
+    [data-theme="dark"] body {
+      background-blend-mode: multiply;
+      background-color: rgba(11, 17, 32, 0.88);
+    }
+
+    [data-theme="dark"] p,
+    [data-theme="dark"] .instructions-list,
+    [data-theme="dark"] .footer {
+      color: var(--secondary-color);
+    }
+
+    [data-theme="dark"] .instructions-list b,
+    [data-theme="dark"] .instructions-list strong {
+      color: #ffffff;
+    }
+
+    [data-theme="dark"] #user-info-form input,
+    [data-theme="dark"] #user-info-form select {
+      background-color: var(--input-bg);
+      border-color: var(--input-border);
+      color: var(--text-color);
+    }
+
+    [data-theme="dark"] #user-info-form input::placeholder {
+      color: #94a3b8;
+    }
+
+    [data-theme="dark"] #user-info-form select option {
+      background-color: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    [data-theme="dark"] .option {
+      background-color: #0f172a;
+      border-color: #334155;
+      color: var(--text-color);
+    }
+
+    [data-theme="dark"] .option label {
+      color: var(--text-color);
+    }
+
+    [data-theme="dark"] .option:hover {
+      background-color: var(--option-hover);
+      border-color: var(--primary-color);
+    }
+
+    [data-theme="dark"] button:disabled {
+      background: #334155 !important;
+      color: #94a3b8 !important;
+      border: 1px solid #475569 !important;
+    }
+
+    [data-theme="dark"] button#start-btn,
+    [data-theme="dark"] button#next-btn,
+    [data-theme="dark"] button#jump-btn {
+      background: linear-gradient(45deg, #2563eb, #0284c7);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    [data-theme="dark"] button#prev-btn {
+      background: #334155;
+      color: #f1f5f9;
+      border: 1px solid #475569;
+      font-weight: 600;
+    }
+
+    [data-theme="dark"] button#prev-btn:hover {
+      background: #475569;
+      color: #ffffff;
+    }
+
+    [data-theme="dark"] .small-btn {
+      background-color: #dc2626;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    [data-theme="dark"] #question-image-container {
+      background-color: #0f172a;
+      padding: 6px;
+      border-radius: var(--border-radius);
+      border: 1px solid #334155;
+      display: inline-block;
+    }
+
+    [data-theme="dark"] #question-image {
+      background-color: #ffffff; /* Menjaga gambar dengan latar transparan tetap jelas dan kontras */
+      padding: 4px;
+      box-sizing: border-box;
+    }
+
+    [data-theme="dark"] #question-image-error {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: #fca5a5;
+      border-color: #7f1d1d;
+    }
+
+    [data-theme="dark"] .nav-bar .nav-links a {
+      color: #cbd5e1;
+    }
+
+    [data-theme="dark"] .nav-bar .nav-links a.active,
+    [data-theme="dark"] .nav-bar .nav-links a:hover {
+      color: var(--primary-color);
+    }
+
+    .theme-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--secondary-color);
+      color: var(--text-color);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      margin-right: 0.5rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      flex-grow: 0;
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .theme-toggle-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--background-color);
+      background-image: url('https://lh3.googleusercontent.com/d/1iWWI32YMhOKAMj4SWf2oLwCYLu-1o0wO');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      margin: 0;
+      padding-top: 80px; /* Beri ruang untuk nav-bar */
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    
+    .content-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 80px);
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    /* Navigation Bar Styling */
+    .nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--card-background);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      box-sizing: border-box;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .nav-bar .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .nav-bar .nav-links {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-bar .nav-links a {
+      margin-left: 1.5rem;
+      text-decoration: none;
+      color: var(--secondary-color);
+      font-weight: 500;
+      padding: 0.5rem 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .nav-bar .nav-links a.active,
+    .nav-bar .nav-links a:hover {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+    }
+
+    /* Card Styling */
+    .card {
+      background-color: var(--card-background);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      padding: 2.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card.hidden {
+      display: none;
+    }
+
+    /* Header */
+    h1, h2 {
+      color: var(--text-color);
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    #user-info-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+
+    #user-info-form input,
+    #user-info-form select {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    #start-validation-message {
+      color: var(--error-color);
+      font-weight: 500;
+      min-height: 20px;
+      text-align: center;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+        gap: 1rem;
+    }
+
+    button {
+      background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-grow: 1;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 123, 255, 0.2);
+    }
+
+    button#prev-btn {
+        background: none;
+        background-color: var(--secondary-color);
+    }
+
+    button:disabled {
+        background: var(--disabled-color);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .small-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        background-color: var(--error-color);
+        flex-grow: 0;
+        margin-top: 0.5rem;
+    }
+    
+    /* [BARU] Gaya untuk daftar petunjuk yang rapi */
+    .instructions-list {
+      text-align: left;
+      line-height: 1.8;
+      padding-left: 25px; /* Memberi ruang untuk nomor */
+      margin-bottom: 1.5rem;
+      color: var(--secondary-color);
+      font-size: 1.1rem;
+    }
+    .instructions-list li {
+      margin-bottom: 0.75rem; /* Jarak antar poin */
+    }
+
+    #question-text {
+      font-size: 1.25rem;
+      min-height: 50px;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    
+    #question-image-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+        min-height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    #question-image-container {
+      max-height: 300px;
+    }
+    
+    #question-image {
+      max-width: 100%;
+      max-height: 300px;
+      height: auto;
+      border-radius: var(--border-radius);
+    }
+    
+    #validation-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 45px;
+        margin-top: 1rem;
+    }
+
+    #validation-message {
+      color: var(--error-color);
+      font-weight: 500;
+    }
+
+    #question-image-error {
+      background-color: #f8d7da;
+      color: var(--error-color);
+      border: 1px solid #f5c6cb;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      text-align: left;
+    }
+
+    #options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      text-align: left;
+    }
+    
+    .option {
+      background-color: var(--background-color);
+      border: 2px solid transparent;
+      padding: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+    
+    .option:hover {
+        background-color: #e9ecef;
+    }
+
+    .option input[type="radio"] {
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .option label {
+      line-height: 1.5;
+    }
+    
+    #timer-container {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    
+    #score-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 2rem auto;
+        color: white;
+    }
+
+    #score-text {
+        font-size: 3rem;
+        font-weight: bold;
+    }
+
+    #score-total-text {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    #request-retake-btn {
+        background: var(--error-color);
+        margin-top: 1.5rem;
+        width: auto;
+        padding: 0.75rem 2.5rem;
+    }
+    
+    #request-retake-btn:hover {
+        background: #c82333;
+        box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--secondary-color);
+      font-weight: 500;
+    }
+    
+    #pause-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1500;
+    }
+    #pause-overlay.hidden {
+      display: none;
+    }
+    .pause-card {
+      background-color: var(--card-background);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      color: var(--text-color);
+    }
+
+    #secure-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .secure-message {
+      color: var(--text-color);
+    }
+    
+    /* Notifikasi Screenshot */
+    #screenshot-alert-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+    }
+    .screenshot-alert-card {
+      background-color: var(--card-background);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      text-align: center;
+      max-width: 90%;
+      width: 400px;
+    }
+    .screenshot-alert-card p {
+      margin: 1rem 0 1.5rem 0;
+    }
+
+    @media print {
+      body > *:not(#secure-overlay) {
+        display: none !important;
+      }
+      #secure-overlay {
+        display: flex !important;
+        pointer-events: auto;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding-top: 65px;
+      }
+      .nav-bar {
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap; 
+      }
+      .nav-bar .logo {
+        font-size: 1.25rem;
+      }
+      .content-wrapper {
+        padding: 0.5rem;
+        align-items: flex-start;
+      }
+      .card {
+        padding: 1.2rem;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      h2 {
+        font-size: 1.25rem;
+      }
+      p, .instructions-list {
+        font-size: 1rem;
+      }
+      #question-text {
+        font-size: 1.05rem;
+      }
+      .option {
+        padding: 0.8rem;
+      }
+      button {
+        padding: 0.9rem 1.5rem;
+        font-size: 0.95rem;
+      }
+      #score-circle {
+        width: 120px;
+        height: 120px;
+      }
+      #score-text {
+        font-size: 2.5rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  
+  <div class="nav-bar">
+    <div class="logo">Aplikasi Kuis</div>
+    <? var url = getScriptUrl(); ?>
+    <div class="nav-links">
+      <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" title="Ganti Tema (Dark / Light)" aria-label="Ganti Tema">
+        <svg id="theme-icon-sun" class="theme-icon" style="display:none;" viewBox="0 0 24 24">
+          <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+        </svg>
+        <svg id="theme-icon-moon" class="theme-icon" viewBox="0 0 24 24">
+          <path d="M12.3 2a10 10 0 0 0-.19 2c0 5.52 4.48 10 10 10 .68 0 1.35-.07 2-.19-1.81 5.32-6.86 9.19-12.81 9.19-7.46 0-13.5-6.04-13.5-13.5 0-5.95 3.87-11 9.19-12.81z"/>
+        </svg>
+      </button>
+      <a href="<?= url ?>?page=quiz" class="active" target="_top">Kuis</a>
+      <a href="<?= url ?>?page=dashboard" target="_top">Dashboard</a>
+    </div>
+  </div>
+  
+  <div id="secure-overlay">
+    <div class="secure-message">
+      <h2>Aksi Tidak Diizinkan</h2>
+      <p>Konten ini dilindungi dan tidak dapat di-capture atau di-screenshot.</p>
+    </div>
+  </div>
+
+  <div id="screenshot-alert-overlay">
+    <div class="screenshot-alert-card">
+        <h2>Peringatan Keamanan</h2>
+        <p>Aplikasi ini tidak mengizinkan untuk mengambil screenshot.</p>
+        <button id="close-screenshot-alert">Tutup</button>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <div id="start-card" class="card">
+      <h1>Selamat Datang di Kuis!</h1>
+      
+      <!-- [DIUBAH] Menggunakan <ol> untuk daftar petunjuk yang rapi -->
+      <ol class="instructions-list">
+        <li>Isi Nama Lengkap (Gunakan huruf kapital semua).</li>
+        <li>Pilih Kelas Anda.</li>
+        <li>Waktu pengerjaan per soal adalah <strong id="quiz-time-display">...</strong><strong> detik</strong>. Jika waktu habis, jawaban tidak dapat diubah.</li>
+        <li>Anda dapat mengerjakan soal secara tidak berurutan dengan tombol "Berikutnya" dan "Sebelumnya".</li>
+        <li>Waktu akan berjalan hanya saat Anda berada di sebuah soal dan akan berhenti saat Anda berpindah soal.</li>
+        <li>Setelah semua soal dikerjakan, klik tombol "Selesai" untuk melihat skor.</li>
+      </ol>
+      
+      <p style="text-align: center;"><b>Selamat Mengerjakan!</b></p>
+      
+      <div id="user-info-form">
+        <input type="text" id="user-name" placeholder="Nama Lengkap" required>
+        <select id="user-class" required>
+          <option value="" disabled selected>Memuat daftar kelas...</option>
+        </select>
+        <span id="start-validation-message"></span>
+      </div>
+
+      <button id="start-btn">Mulai Kuis</button>
+    </div>
+
+    <div id="quiz-card" class="card hidden">
+      <div id="timer-container">
+        Waktu Tersisa: <span id="time-left"></span> detik
+      </div>
+      <h2 id="question-number"></h2>
+      <div id="question-image-wrapper" class="hidden">
+          <div id="question-image-container" class="hidden">
+            <img id="question-image" src="" alt="Soal Gambar">
+          </div>
+          <div id="question-image-error" class="hidden"></div>
+      </div>
+      <p id="question-text"></p>
+      <div id="options-container"></div>
+      <div id="validation-area">
+          <span id="validation-message"></span>
+          <button id="jump-btn" class="hidden small-btn"></button>
+      </div>
+      <div class="button-container">
+          <button id="prev-btn">Sebelumnya</button>
+          <button id="next-btn">Berikutnya</button>
+      </div>
+    </div>
+
+    <div id="loading-card" class="card hidden">
+      <h2>Memuat Soal...</h2>
+      <p>Mohon tunggu sebentar.</p>
+    </div>
+
+    <div id="result-card" class="card hidden">
+      <h1>Kuis Selesai!</h1>
+      <p id="result-message">Berikut adalah hasil akhir Anda:</p>
+      <div id="score-circle">
+          <span id="score-text"></span>
+          <span id="score-total-text"></span>
+      </div>
+      <button id="request-retake-btn" class="hidden">Izin Mengerjakan Ulang Kuis</button>
+    </div>
+  </div>
+  
+  <div id="pause-overlay" class="hidden">
+    <div class="pause-card">
+        <h2 id="pause-title">Waktu Quiz Habis</h2>
+        <p id="pause-message">Silahkan hubungi Guru bersangkutan.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    Aplikasi Quiz by Sri Mulyani S. Pd.
+  </div>
+
+  <script>
+    const quizCard = document.getElementById('quiz-card');
+    const loadingCard = document.getElementById('loading-card');
+    const startCard = document.getElementById('start-card');
+    const resultCard = document.getElementById('result-card');
+    const startBtn = document.getElementById('start-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const jumpBtn = document.getElementById('jump-btn');
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const validationMessageEl = document.getElementById('validation-message');
+    const timeLeftEl = document.getElementById('time-left');
+    const scoreTextEl = document.getElementById('score-text');
+    const scoreTotalTextEl = document.getElementById('score-total-text');
+    const resultMessageEl = document.getElementById('result-message');
+    const requestRetakeBtn = document.getElementById('request-retake-btn');
+    const userNameEl = document.getElementById('user-name');
+    const userClassEl = document.getElementById('user-class');
+    const startValidationMessageEl = document.getElementById('start-validation-message');
+    const imageWrapper = document.getElementById('question-image-wrapper');
+    const imageContainer = document.getElementById('question-image-container');
+    const imageEl = document.getElementById('question-image');
+    const imageErrorEl = document.getElementById('question-image-error');
+    const pauseOverlay = document.getElementById('pause-overlay');
+    const screenshotAlertOverlay = document.getElementById('screenshot-alert-overlay');
+    const closeScreenshotAlertBtn = document.getElementById('close-screenshot-alert');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('appTheme') || 'light';
+      applyTheme(savedTheme);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('appTheme', theme);
+      if (sunIcon && moonIcon) {
+        if (theme === 'dark') {
+          sunIcon.style.display = 'block';
+          moonIcon.style.display = 'none';
+        } else {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'block';
+        }
+      }
+    }
+
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+      });
+    }
+
+    initTheme();
+
+    let originalQuestions = [];
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let timeRemaining = [];
+    let timerInterval;
+    let userName = '';
+    let userClass = '';
+    let imageUrlMap = {};
+    let isGloballyPaused = false;
+    let globalStatusChecker;
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function saveQuizState() {
+        if (questions.length === 0) return;
+        const state = {
+            currentQuestionIndex: currentQuestionIndex,
+            userAnswers: userAnswers,
+            timeRemaining: timeRemaining,
+            userName: userName,
+            userClass: userClass,
+            questions: questions 
+        };
+        localStorage.setItem('quizProgress', JSON.stringify(state));
+    }
+
+    function onQuizDataLoaded(data) {
+      if (!data || data.error) {
+        onFailure({ message: data ? data.error : "Gagal menerima data kuis dari server." });
+        return;
+      }
+      imageUrlMap = data.images || {};
+      
+      if (data.quizStatus === 'paused') {
+        isGloballyPaused = true;
+        showGlobalPauseOverlay();
+      }
+      globalStatusChecker = setInterval(checkGlobalStatus, 5000);
+      
+      onQuestionsLoaded({ questions: data.questions });
+    }
+    
+    function checkGlobalStatus() {
+      if (document.hidden) return;
+      google.script.run
+        .withSuccessHandler(status => {
+          if (status === 'paused' && !isGloballyPaused) {
+            isGloballyPaused = true;
+            clearInterval(timerInterval);
+            if (!quizCard.classList.contains('hidden')) {
+              finishQuiz(true);
+            } else {
+              showGlobalPauseOverlay();
+            }
+          } else if (status === 'active' && isGloballyPaused) {
+            isGloballyPaused = false;
+            hideGlobalPauseOverlay();
+            startTimer(parseInt(timeLeftEl.textContent));
+          }
+        })
+        .getQuizStatus();
+    }
+
+    function showGlobalPauseOverlay(title = "Waktu Quiz Habis", message = "Silahkan hubungi Guru bersangkutan.") {
+      document.getElementById('pause-title').textContent = title;
+      document.getElementById('pause-message').textContent = message;
+      pauseOverlay.classList.remove('hidden');
+      quizCard.classList.add('hidden');
+    }
+
+    function hideGlobalPauseOverlay() {
+      pauseOverlay.classList.add('hidden');
+      quizCard.classList.remove('hidden');
+    }
+
+    function onQuestionsLoaded(loadedData) {
+      if (!loadedData || !loadedData.questions) {
+        onFailure({ message: "Data soal tidak ditemukan dalam respons server." });
+        return;
+      }
+      
+      originalQuestions = loadedData.questions;
+      
+      if (window.restoredState && window.restoredState.questions) {
+          questions = window.restoredState.questions;
+          const state = window.restoredState;
+          currentQuestionIndex = state.currentQuestionIndex || 0;
+          userAnswers = state.userAnswers || new Array(questions.length).fill(null);
+          timeRemaining = state.timeRemaining || questions.map(q => q.time);
+          userName = state.userName || '';
+          userClass = state.userClass || '';
+          window.restoredState = null;
+      } else {
+          questions = shuffleArray([...originalQuestions]);
+          currentQuestionIndex = 0;
+          userAnswers = new Array(questions.length).fill(null);
+          timeRemaining = questions.map(q => q.time);
+      }
+      
+      startCard.classList.add('hidden');
+      loadingCard.classList.add('hidden');
+      if (!isGloballyPaused) {
+        quizCard.classList.remove('hidden');
+      }
+      displayQuestion();
+    }
+    
+    function displayQuestion() {
+        clearInterval(timerInterval);
+        const question = questions[currentQuestionIndex];
+        const remainingTime = timeRemaining[currentQuestionIndex];
+
+        questionNumberEl.textContent = `Soal #${currentQuestionIndex + 1}`;
+        questionTextEl.innerHTML = question.question.replace(/\n/g, '<br>');
+        optionsContainer.innerHTML = '';
+        
+        handleImageLoading(question.imageId);
+
+        const optionsArray = Object.entries(question.options).filter(([key, value]) => value !== null);
+        const shuffledOptions = shuffleArray(optionsArray);
+
+        shuffledOptions.forEach(([key, value]) => {
+            const optionId = `option-${key}`;
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'option';
+            optionDiv.innerHTML = `
+                <input type="radio" id="${optionId}" name="option" value="${key}">
+                <label for="${optionId}">${value}</label>
+            `;
+            optionsContainer.appendChild(optionDiv);
+        });
+
+        if (userAnswers[currentQuestionIndex] && userAnswers[currentQuestionIndex].answer) {
+            const radioToCheck = document.querySelector(`input[name="option"][value="${userAnswers[currentQuestionIndex].answer}"]`);
+            if (radioToCheck) radioToCheck.checked = true;
+        }
+        
+        disableOptions(remainingTime <= 0);
+        
+        updateButtons();
+        if (!isGloballyPaused) {
+          setTimeout(() => startTimer(remainingTime), 0);
+        } else {
+          timeLeftEl.textContent = remainingTime;
+        }
+    }
+
+    function handleImageLoading(imageId) {
+        imageWrapper.style.display = 'none';
+        imageContainer.style.display = 'none';
+        imageErrorEl.style.display = 'none';
+
+        if (!imageId || imageId === '-') return;
+
+        imageWrapper.style.display = 'flex';
+
+        if (imageUrlMap[imageId]) {
+            imageEl.src = imageUrlMap[imageId];
+            imageContainer.style.display = 'block';
+        } else {
+            imageErrorEl.textContent = `Gagal memuat gambar ID: ${imageId}. Pastikan ID valid.`;
+            imageErrorEl.style.display = 'block';
+        }
+    }
+
+    function disableOptions(disabled = true) {
+        document.querySelectorAll('input[name="option"]').forEach(opt => {
+            opt.disabled = disabled;
+            opt.closest('.option').style.cursor = disabled ? 'not-allowed' : 'pointer';
+            opt.closest('.option').style.opacity = disabled ? 0.6 : 1;
+        });
+    }
+
+    function leaveQuestion() {
+        clearInterval(timerInterval);
+        timeRemaining[currentQuestionIndex] = parseInt(timeLeftEl.textContent) || 0;
+        const selectedOption = document.querySelector('input[name="option"]:checked');
+        const answer = selectedOption ? selectedOption.value : null;
+
+        userAnswers[currentQuestionIndex] = {
+            question: questions[currentQuestionIndex].question,
+            answer: answer
+        };
+        saveQuizState();
+    }
+    
+    function runCompletionCheck() {
+        const firstIncomplete = userAnswers.findIndex((answer, index) => (!answer || !answer.answer) && timeRemaining[index] > 0);
+
+        if (firstIncomplete !== -1) {
+            validationMessageEl.textContent = `Soal no. ${firstIncomplete + 1} belum dikerjakan.`;
+            jumpBtn.textContent = `Pergi ke Soal No. ${firstIncomplete + 1}`;
+            jumpBtn.dataset.targetIndex = firstIncomplete;
+            jumpBtn.classList.remove('hidden');
+            return false;
+        } else {
+            validationMessageEl.textContent = '';
+            jumpBtn.classList.add('hidden');
+            return true;
+        }
+    }
+
+    function updateButtons() {
+        prevBtn.style.display = (currentQuestionIndex === 0) ? 'none' : '';
+        nextBtn.textContent = (currentQuestionIndex === questions.length - 1) ? 'Selesai' : 'Berikutnya';
+    }
+
+    function handleNext() { 
+        leaveQuestion(); 
+        
+        if (currentQuestionIndex === questions.length - 1) {
+            if (runCompletionCheck()) {
+                finishQuiz();
+            }
+        } else {
+            currentQuestionIndex++; 
+            displayQuestion(); 
+        } 
+    }
+
+    function handlePrev() { 
+        leaveQuestion(); 
+        if (currentQuestionIndex > 0) { 
+            currentQuestionIndex--; 
+            displayQuestion(); 
+        } 
+    }
+
+    function handleJump() { 
+        leaveQuestion(); 
+        currentQuestionIndex = parseInt(jumpBtn.dataset.targetIndex); 
+        displayQuestion(); 
+    }
+    
+    function finishQuiz(isAutoFinish = false) {
+      clearInterval(globalStatusChecker);
+      leaveQuestion();
+      
+      if (!isAutoFinish) {
+        if (!runCompletionCheck()) {
+          return;
+        }
+      }
+
+      localStorage.removeItem('quizProgress');
+
+      quizCard.classList.add('hidden');
+      loadingCard.classList.remove('hidden');
+      loadingCard.querySelector('h2').textContent = 'Memeriksa Jawaban...';
+
+      const orderedAnswers = new Array(originalQuestions.length).fill(null);
+      questions.forEach((shuffledQuestion, index) => {
+          const originalIndex = originalQuestions.findIndex(q => q.question === shuffledQuestion.question);
+          if (originalIndex !== -1 && userAnswers[index]) {
+              orderedAnswers[originalIndex] = userAnswers[index];
+          }
+      });
+      
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          const submissionData = {
+            answers: orderedAnswers,
+            name: userName,
+            class: userClass,
+            ipAddress: data.ip
+          };
+          google.script.run.withSuccessHandler(res => showResults(res, false)).withFailureHandler(onFailure).checkAnswers(submissionData);
+        })
+        .catch(error => {
+          console.error('Gagal mendapatkan IP:', error);
+          const submissionData = {
+            answers: orderedAnswers,
+            name: userName,
+            class: userClass,
+            ipAddress: 'Gagal mendapatkan IP'
+          };
+          google.script.run.withSuccessHandler(res => showResults(res, false)).withFailureHandler(onFailure).checkAnswers(submissionData);
+        });
+    }
+        
+    function startQuiz() { 
+        userName = userNameEl.value.trim();
+        userClass = userClassEl.value;
+
+        if (!userName || !userClass) {
+            startValidationMessageEl.textContent = 'Nama dan Kelas wajib diisi.';
+            return;
+        }
+        startValidationMessageEl.textContent = '';
+        startBtn.disabled = true;
+        startBtn.textContent = 'Mengecek...';
+        
+        localStorage.setItem('studentInfo', JSON.stringify({ name: userName, studentClass: userClass }));
+        localStorage.removeItem('quizProgress');
+        localStorage.removeItem('retakeRequestSent');
+        
+        google.script.run
+            .withSuccessHandler(handleManualCompletionCheck)
+            .withFailureHandler(onFailure)
+            .checkStudentCompletion({ name: userName, studentClass: userClass });
+    }
+
+    function handleManualCompletionCheck(result) {
+        startBtn.disabled = false;
+        startBtn.textContent = 'Mulai Kuis';
+
+        if (result && result.error) {
+            startValidationMessageEl.textContent = result.error;
+            return;
+        }
+
+        if (!result) {
+            onFailure({ message: "Gagal mengecek status pengerjaan." });
+            return;
+        }
+
+        if (result.active === false) {
+            startValidationMessageEl.textContent = 'Kuis untuk kelas Anda saat ini tidak aktif.';
+            return;
+        }
+
+        if (result.completed) {
+            showResults(result, true);
+        } else {
+            startCard.classList.add('hidden');
+            loadingCard.classList.remove('hidden');
+            loadingCard.querySelector('h2').textContent = 'Memuat Soal dan Gambar...';
+            google.script.run.withSuccessHandler(onQuizDataLoaded).withFailureHandler(onFailure).getQuizData();
+        }
+    }
+
+    function handleAutoCompletionCheck(result) {
+        loadingCard.classList.add('hidden');
+
+        if (!result || result.error) {
+            localStorage.removeItem('studentInfo');
+            startCard.classList.remove('hidden');
+            onFailure({ message: result ? result.error : "Gagal mengecek status pengerjaan." });
+            return;
+        }
+
+        if (result.completed) {
+            showResults(result, true);
+            const requestSent = localStorage.getItem('retakeRequestSent');
+            if (requestSent === 'true') {
+                requestRetakeBtn.disabled = true;
+                requestRetakeBtn.textContent = 'Permintaan Terkirim';
+                resultMessageEl.innerHTML = "Berikut adalah nilai yang Anda peroleh sebelumnya.<br><br><b>Permintaan Anda telah berhasil dikirim. Mohon tunggu persetujuan dari Admin.</b>";
+            }
+        } else {
+            localStorage.removeItem('retakeRequestSent');
+            startCard.classList.remove('hidden');
+            userNameEl.value = userName;
+            userClassEl.value = userClass;
+            startValidationMessageEl.textContent = 'Sesi Anda telah direset oleh admin. Silakan kerjakan ulang kuis.';
+            startValidationMessageEl.style.color = '#28a745';
+        }
+    }
+
+    function showResults(result, isReturningStudent = false) {
+        clearInterval(globalStatusChecker);
+        loadingCard.classList.add('hidden');
+        startCard.classList.add('hidden');
+        resultCard.classList.remove('hidden');
+        
+        if (isReturningStudent) {
+            resultCard.querySelector('h1').textContent = "Anda Sudah Mengerjakan Kuis";
+            resultMessageEl.innerHTML = "Berikut adalah nilai yang Anda peroleh sebelumnya.";
+            requestRetakeBtn.classList.remove('hidden');
+        } else {
+            resultCard.querySelector('h1').textContent = "Kuis Selesai!";
+            resultMessageEl.textContent = "Berikut adalah hasil akhir Anda:";
+            requestRetakeBtn.classList.add('hidden');
+        }
+
+        if (result && typeof result.score !== 'undefined' && typeof result.total !== 'undefined') {
+            if(result.error) {
+              onFailure({ message: result.error });
+              return;
+            }
+            scoreTextEl.textContent = result.score;
+            scoreTotalTextEl.textContent = `dari total ${result.total}`;
+        } else {
+            scoreTextEl.textContent = "Error";
+            scoreTotalTextEl.textContent = "Gagal memuat hasil";
+        }
+    }
+
+    function startTimer(duration) {
+        timeLeftEl.textContent = duration;
+        if (duration <= 0) {
+            timeRemaining[currentQuestionIndex] = 0;
+            saveQuizState();
+            return;
+        };
+
+        timerInterval = setInterval(() => {
+            duration--;
+            timeLeftEl.textContent = duration;
+            timeRemaining[currentQuestionIndex] = duration;
+            saveQuizState();
+
+            if (duration <= 0) {
+                clearInterval(timerInterval);
+                disableOptions(true);
+                const allTimesUp = timeRemaining.every(t => t <= 0);
+                if (allTimesUp) {
+                    finishQuiz(true);
+                }
+            }
+        }, 1000);
+    }
+    
+    function onFailure(error) { 
+        clearInterval(globalStatusChecker);
+        loadingCard.classList.add('hidden');
+        quizCard.classList.add('hidden');
+        resultCard.classList.add('hidden');
+        startCard.classList.remove('hidden');
+        
+        startBtn.disabled = false;
+        startBtn.textContent = 'Mulai Kuis';
+
+        const existingError = startCard.querySelector('.error-message');
+        if (existingError) {
+          existingError.remove();
+        }
+
+        const errorP = document.createElement('p');
+        errorP.className = 'error-message';
+        errorP.style.color = 'red';
+        errorP.textContent = `Terjadi kesalahan: ${error.message}. Silakan muat ulang halaman.`;
+        startCard.appendChild(errorP);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { 
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        
+        document.addEventListener('keydown', event => {
+          if ((event.ctrlKey && (event.key === 's' || event.key === 'p')) || event.key === 'F12') {
+            event.preventDefault();
+          }
+          if (event.key === 'PrintScreen') {
+            event.preventDefault();
+            screenshotAlertOverlay.style.display = 'flex';
+          }
+        });
+        
+        closeScreenshotAlertBtn.addEventListener('click', () => {
+          screenshotAlertOverlay.style.display = 'none';
+        });
+        
+        google.script.run
+            .withSuccessHandler(populateClassDropdown)
+            .withFailureHandler(onFailure)
+            .getQuizPageData();
+        
+        const studentInfoJSON = localStorage.getItem('studentInfo');
+        const progressStateJSON = localStorage.getItem('quizProgress');
+
+        if (progressStateJSON) {
+            try {
+                window.restoredState = JSON.parse(progressStateJSON);
+                if (typeof window.restoredState.currentQuestionIndex === 'undefined') {
+                    throw new Error("Invalid state object");
+                }
+                userName = window.restoredState.userName;
+                userClass = window.restoredState.userClass;
+                startCard.classList.add('hidden');
+                loadingCard.classList.remove('hidden');
+                google.script.run.withSuccessHandler(onQuizDataLoaded).withFailureHandler(onFailure).getQuizData();
+            } catch (e) {
+                console.error("Gagal memuat status kuis dari localStorage:", e);
+                localStorage.removeItem('quizProgress');
+            }
+        } else if (studentInfoJSON) {
+            try {
+                const studentInfo = JSON.parse(studentInfoJSON);
+                if (studentInfo.name && studentInfo.studentClass) {
+                    userName = studentInfo.name;
+                    userClass = studentInfo.studentClass;
+                    
+                    startCard.classList.add('hidden');
+                    loadingCard.classList.remove('hidden');
+                    loadingCard.querySelector('h2').textContent = 'Mengecek status...';
+                    
+                    google.script.run
+                        .withSuccessHandler(handleAutoCompletionCheck)
+                        .withFailureHandler(onFailure)
+                        .checkStudentCompletion({ name: userName, studentClass: userClass });
+                } else {
+                    localStorage.removeItem('studentInfo');
+                }
+            } catch (e) {
+                console.error("Gagal parse student info:", e);
+                localStorage.removeItem('studentInfo');
+            }
+        }
+    });
+
+    function populateClassDropdown(data) {
+        if (data && data.quizTime) {
+            document.getElementById('quiz-time-display').textContent = data.quizTime;
+        } else {
+            document.getElementById('quiz-time-display').textContent = "120";
+        }
+
+        if (!data || data.error || !data.classes) {
+            userClassEl.innerHTML = '<option value="">Gagal memuat kelas</option>';
+            return;
+        }
+        
+        userClassEl.innerHTML = '<option value="" disabled selected>Pilih Kelas</option>';
+        data.classes.forEach(className => {
+            const option = document.createElement('option');
+            option.value = className;
+            option.textContent = className;
+            userClassEl.appendChild(option);
+        });
+    }
+
+    startBtn.addEventListener('click', startQuiz);
+    nextBtn.addEventListener('click', handleNext);
+    prevBtn.addEventListener('click', handlePrev);
+    jumpBtn.addEventListener('click', handleJump);
+    
+    requestRetakeBtn.addEventListener('click', () => {
+      requestRetakeBtn.disabled = true;
+      requestRetakeBtn.textContent = 'Mengirim...';
+
+      const studentDetails = {
+          name: userName,
+          studentClass: userClass
+      };
+
+      google.script.run
+          .withSuccessHandler(response => {
+              if (response.success) {
+                  localStorage.setItem('retakeRequestSent', 'true');
+                  requestRetakeBtn.textContent = 'Permintaan Terkirim';
+                  resultMessageEl.innerHTML += "<br><br><b>Permintaan Anda telah berhasil dikirim. Mohon tunggu persetujuan dari Admin.</b>";
+              } else {
+                  requestRetakeBtn.textContent = 'Gagal Mengirim';
+                  requestRetakeBtn.disabled = false;
+                  resultMessageEl.innerHTML += `<br><br><b style="color:var(--error-color);">${response.error || 'Terjadi kesalahan saat mengirim.'}</b>`;
+              }
+          })
+          .withFailureHandler(err => {
+              requestRetakeBtn.disabled = false;
+              requestRetakeBtn.textContent = 'Izin Mengerjakan Ulang Kuis';
+              resultMessageEl.innerHTML += `<br><br><b style="color:var(--error-color);">Error: ${err.message}</b>`;
+          })
+          .sendPermissionRequestEmail(studentDetails);
+    });
+
+    optionsContainer.addEventListener('click', (event) => {
+        const optionDiv = event.target.closest('.option');
+        if (optionDiv) {
+            const radio = optionDiv.querySelector('input[type="radio"]');
+            if (radio && !radio.disabled) {
+                radio.checked = true;
+                const selectedOption = document.querySelector('input[name="option"]:checked');
+                userAnswers[currentQuestionIndex] = {
+                    question: questions[currentQuestionIndex].question,
+                    answer: selectedOption ? selectedOption.value : null
+                };
+                saveQuizState();
+            }
+        }
+    });
+  </script>
+</body>
+</html>

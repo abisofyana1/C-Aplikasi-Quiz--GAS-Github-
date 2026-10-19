@@ -51,13 +51,13 @@ function doGet(e) {
   if (page === "dashboard") {
     return HtmlService.createTemplateFromFile("dashboard")
       .evaluate()
-      .setTitle("Dashboard Hasil Kuis")
+      .setTitle("E-Quiz - Dashboard")
       .addMetaTag("viewport", "width=device-width, initial-scale=1.0");
   }
 
   return HtmlService.createTemplateFromFile("index")
     .evaluate()
-    .setTitle("Aplikasi Kuis Online")
+    .setTitle("E-Quiz")
     .addMetaTag("viewport", "width=device-width, initial-scale=1.0");
 }
 
